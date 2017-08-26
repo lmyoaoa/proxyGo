@@ -123,7 +123,7 @@ func handleConnection(conn net.Conn) {
 func readBytes(conn io.Reader, count int) (buf []byte) {
 	buf = make([]byte, count)
 	if _, err := io.ReadFull(conn, buf); err != nil {
-		panic(err)
+		fmt.Println(err.Error())
 	}
 	return
 }

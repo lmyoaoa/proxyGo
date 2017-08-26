@@ -130,7 +130,7 @@ func readBytes(conn io.Reader, count int) (buf []byte) {
 
 func protocolCheck(assert bool) {
 	if !assert {
-		panic("protocol error")
+		fmt.Println("protocol error")
 	}
 }
 

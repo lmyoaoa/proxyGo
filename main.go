@@ -1,12 +1,12 @@
 package main
 
+// 协议参考 https://zh.wikipedia.org/wiki/SOCKS
+
 import (
 	"fmt"
 	"io"
 	"log"
 	"net"
-	"strconv"
-	"strings"
 )
 
 var pln = fmt.Println
@@ -113,8 +113,8 @@ func handleConnection(conn net.Conn) {
 
 	buf := make([]byte, 10)
 	copy(buf, []byte{0x05, 0x00, 0x00, 0x01})
-	packNetAddr(backconn.RemoteAddr(), buf[4:])
 	conn.Write(buf)
+	// conn.Write([]byte{0x05, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
 
 	go io.Copy(backconn, conn)
 	io.Copy(conn, backconn)
@@ -137,20 +137,4 @@ func protocolCheck(assert bool) {
 func errorReplyConnect(reason byte) []byte {
 	return []byte{0x05, reason, 0x00, 0x01,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-}
-
-// Convert a IP:Port string to a byte array in network order.
-// e.g.: 74.125.31.104:80 -> [74 125 31 104 0 80]
-func packNetAddr(addr net.Addr, buf []byte) {
-	ipport := addr.String()
-	pair := strings.Split(ipport, ":")
-	ipstr, portstr := pair[0], pair[1]
-	port, err := strconv.Atoi(portstr)
-	if err != nil {
-		panic(fmt.Sprintf("invalid address %s", ipport))
-	}
-
-	copy(buf[:4], net.ParseIP(ipstr).To4())
-	buf[4] = byte(port / 256)
-	buf[5] = byte(port % 256)
 }

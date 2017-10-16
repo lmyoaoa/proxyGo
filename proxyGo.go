@@ -93,8 +93,9 @@ func handle(conn net.Conn) {
 	if err != nil {
 		log.Printf("连接：%s出错: %s\n", remoteHost, err)
 		errReply(0x05)
+	} else {
+		defer remoteConn.Close()
 	}
-	defer remoteConn.Close()
 
 	buf := make([]byte, 10)
 	copy(buf, []byte{0x05, 0x00, 0x00, 0x01})

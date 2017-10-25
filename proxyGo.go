@@ -95,15 +95,15 @@ func handle(conn net.Conn) {
 		errReply(0x05)
 	} else {
 		defer remoteConn.Close()
+
+		buf := make([]byte, 10)
+		copy(buf, []byte{0x05, 0x00, 0x00, 0x01})
+		conn.Write(buf)
+		// conn.Write([]byte{0x05, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
+
+		go io.Copy(remoteConn, conn)
+		io.Copy(conn, remoteConn)
 	}
-
-	buf := make([]byte, 10)
-	copy(buf, []byte{0x05, 0x00, 0x00, 0x01})
-	conn.Write(buf)
-	// conn.Write([]byte{0x05, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
-
-	go io.Copy(remoteConn, conn)
-	io.Copy(conn, remoteConn)
 }
 
 func read(conn net.Conn, len int) []byte {
